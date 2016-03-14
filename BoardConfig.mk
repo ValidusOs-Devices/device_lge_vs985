@@ -37,11 +37,11 @@ KERNEL_TOOLCHAIN_PREFIX := arm-eabi-
 # Rom Toolchain
 TARGET_GCC_VERSION_EXP := 4.9-uber
 # Optimizations
-CLANG_O3 := false
+CLANG_O3 := true
 STRICT_ALIASING := false
-KRAIT_TUNINGS := false
+KRAIT_TUNINGS := true
 GRAPHITE_OPTS := false
-ENABLE_GCCONLY := false
+ENABLE_GCCONLY := true
 
 # NFC
 BOARD_NFC_CHIPSET := pn547
