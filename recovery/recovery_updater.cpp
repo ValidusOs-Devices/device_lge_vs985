@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
 #include "edify/expr.h"
 #include "updater/install.h"
 
@@ -151,12 +150,13 @@ err_ret:
 }
 
 /* verify_baseband("BASEBAND_VERSION", "BASEBAND_VERSION", ...) */
-Value * VerifyBasebandFn(const char *name, State *state, int argc, Expr *argv[]) {
+Value * VerifyBasebandFn(const char *name, State *state, const std::vector<std::unique_ptr<Expr>>& argv) {
     char current_baseband_version[BASEBAND_VER_BUF_LEN];
-    char *baseband_string;
+    std::vector<std::string>baseband_string;
     char *baseband_version;
     char *baseband_short_version;
-    int i, ret;
+    size_t i;
+    int ret;
 
     ret = get_baseband_version(current_baseband_version, BASEBAND_VER_BUF_LEN);
     if (ret) {
@@ -164,14 +164,13 @@ Value * VerifyBasebandFn(const char *name, State *state, int argc, Expr *argv[])
                 name, ret);
     }
 
-    for (i = 0; i < argc; i++) {
-        baseband_string = Evaluate(state, argv[i]);
-        if (baseband_string < 0) {
+    for (i = 0; i < argv.size(); i++) {
+        if (!ReadArgs(state, argv, &baseband_string)) {
             return ErrorAbort(state, "%s() error parsing arguments: %d",
-                name, baseband_string);
+                name, baseband_string[i].c_str());
         }
 
-        baseband_short_version = strtok(baseband_string, ":");
+        baseband_short_version = std::strtok((char *)baseband_string[i].c_str(), ":");
         baseband_version = strtok(NULL, ":");
 
         uiPrintf(state, "Checking for BASEBAND version %s", baseband_short_version);
